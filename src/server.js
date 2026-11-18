@@ -2,9 +2,11 @@ const path = require('path');
 const express = require('express');
 const pool = require('./db');
 const { crearSesion } = require('./session');
-const { cargarUsuario, requireLogin, requireBackoffice, requireSupervisor } = require('./middleware/auth');
+const { cargarUsuario, requireLogin, requireBackoffice, requireAdmin, requireSupervisor } = require('./middleware/auth');
 const usuarios = require('./usuarios');
 const authRoutes = require('./routes/auth');
+const postulantesRoutes = require('./routes/postulantes');
+const { paginaAdmin, RUTAS_PENDIENTES } = require('./vistas');
 
 const PUBLIC = path.join(__dirname, '..', 'public');
 
@@ -24,6 +26,7 @@ function crearApp() {
 
     // ---- API ------------------------------------------------------------
     app.use('/api', authRoutes);
+    app.use('/api/postulantes', postulantesRoutes);
 
     // Verifica que la app llegue a la base (no expone datos).
     app.get('/api/health', async (req, res) => {
@@ -43,11 +46,18 @@ function crearApp() {
         res.sendFile(path.join(PUBLIC, 'index.html'));
     });
 
-    // Módulos todavía no migrados: página provisoria que muestra quién está logueado.
-    // Cada sección exige su rol, igual que en PHP (admin/auth.php, supervisor/...).
+    // ---- Backoffice: módulos migrados ----
+    app.get('/admin/postulantes', requireBackoffice, paginaAdmin('admin/postulantes.html'));
+
+    // ---- Backoffice: secciones del menú todavía no migradas (con su permiso) ----
+    const adminEnMigracion = paginaAdmin('admin/en-migracion.html');
+    for (const { ruta, soloAdmin } of RUTAS_PENDIENTES) {
+        app.get(ruta, soloAdmin ? requireAdmin : requireBackoffice, adminEnMigracion);
+    }
+
+    // Vigilador y supervisor todavía no migrados: página provisoria con el usuario logueado.
     const enMigracion = (req, res) => res.sendFile(path.join(PUBLIC, 'en-migracion.html'));
     app.get('/dashboard', requireLogin, enMigracion);
-    app.get(['/admin/dashboard', '/admin/postulantes'], requireBackoffice, enMigracion);
     app.get('/supervisor/dashboard', requireSupervisor, enMigracion);
     app.get('/registro', (req, res) => res.sendFile(path.join(PUBLIC, 'en-migracion.html')));
 

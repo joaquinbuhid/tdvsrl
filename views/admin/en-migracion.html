@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TDV - En migración</title>
+    <link rel="stylesheet" href="/css/style.css?v=2">
+    <link rel="stylesheet" href="/css/admin.css?v=20261020">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<body>
+<!--NAV-->
+<main style="max-width:900px; margin:0 auto; padding:2rem 1rem;">
+    <div style="background:var(--card); border-radius:10px; box-shadow:var(--shadow); padding:1.5rem;">
+        <h1 style="font-size:1.2rem; color:var(--primary); margin:0 0 .6rem;">Sección en migración</h1>
+        <p style="color:var(--text-muted); margin:0;">
+            <code id="ruta"></code> todavía no está disponible en la versión Node. Por ahora usá el sistema actual.
+        </p>
+    </div>
+</main>
+<script>document.getElementById('ruta').textContent = location.pathname;</script>
+</body>
+</html>

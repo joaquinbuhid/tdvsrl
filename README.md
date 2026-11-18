@@ -9,12 +9,16 @@ Usa **la misma base MySQL** que el sistema PHP; se migra módulo por módulo y l
 |---|---|
 | Conexión a la base | ✅ |
 | Login / logout / sesión | ✅ |
+| Menú del backoffice (según rol) | ✅ |
+| Postulantes: listado, filtros, paginación, detalle | ✅ |
+| Postulantes: eliminar, mails, exportar Excel | ⏳ |
 | Dashboard vigilador (marcar entrada/salida) | ⏳ |
 | Supervisor | ⏳ |
-| Backoffice (postulantes, entrevistas, legajos, liquidación…) | ⏳ |
+| Resto del backoffice (entrevistas, legajos, liquidación…) | ⏳ |
 | Registro de cuentas | ⏳ |
 
-Las secciones no migradas muestran una página provisoria con el usuario logueado.
+Las secciones no migradas muestran una página provisoria (con el menú y el permiso de rol correspondiente).
+En el menú, las secciones pendientes llevan un punto `·` al lado del nombre.
 
 ## Requisitos
 
@@ -75,6 +79,9 @@ src/session.js          sesiones en MySQL
 src/usuarios.js         roles, reglas de acceso y consultas de empleados
 src/middleware/auth.js  carga del usuario y requireLogin / requireBackoffice / requireAdmin / requireSupervisor
 src/routes/auth.js      POST /api/login, POST|GET /api/logout, GET /api/me
-public/                 páginas estáticas (login, css)
+src/routes/postulantes.js  GET /api/postulantes (filtros + paginación)
+src/vistas.js           menú lateral del backoffice y armado de páginas de views/
+views/admin/            páginas del backoffice (requieren sesión; no se sirven directo)
+public/                 páginas y archivos públicos (login, css, js)
 test/                   tests
 ```
