@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TDV — Módulo en migración</title>
+    <link rel="stylesheet" href="/css/style.css?v=2">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<body>
+<div class="login-wrap">
+    <div class="login-card">
+        <div class="login-logo">
+            <h1>TDV Seguridad</h1>
+            <p>Sistema de Asistencias — versión Node</p>
+        </div>
+
+        <div id="sesion" style="margin-bottom:1rem;">Cargando...</div>
+
+        <p style="font-size:.9rem;color:var(--text-muted);">
+            Esta sección (<code id="ruta"></code>) todavía no se migró a Node.
+            Por ahora usá el sistema actual.
+        </p>
+
+        <a class="btn btn-primary" id="btnSalir" href="/api/logout" style="display:none;text-align:center;text-decoration:none;margin-top:1rem;">Cerrar sesión</a>
+        <a class="btn btn-primary" id="btnVolver" href="/" style="display:none;text-align:center;text-decoration:none;margin-top:1rem;">Volver al ingreso</a>
+    </div>
+</div>
+<script>
+document.getElementById('ruta').textContent = location.pathname;
+
+const ROLES = { 1: 'Vigilador', 2: 'Supervisor', 3: 'Oficinista', 4: 'Administrador' };
+
+function esc(s) {
+    return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+fetch('/api/me')
+    .then(async (res) => {
+        const box = document.getElementById('sesion');
+        if (!res.ok) {
+            box.textContent = 'No hay sesión iniciada.';
+            document.getElementById('btnVolver').style.display = 'block';
+            return;
+        }
+        const u = await res.json();
+        box.innerHTML = `
+            <div class="alert alert-success show" style="display:block;">
+                Sesión iniciada como <strong>${esc(u.nombre)}</strong> (${esc(u.email)})<br>
+                Rol: <strong>${esc(ROLES[u.tipo] || u.tipo)}</strong>
+                ${u.objetivo ? `<br>Objetivo: <strong>${esc(u.objetivo)}</strong>` : ''}
+            </div>`;
+        document.getElementById('btnSalir').style.display = 'block';
+    })
+    .catch(() => {
+        document.getElementById('sesion').textContent = 'No se pudo conectar al servidor.';
+    });
+</script>
+</body>
+</html>
